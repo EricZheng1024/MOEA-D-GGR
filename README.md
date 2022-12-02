@@ -1,0 +1,1 @@
+Place the folder in path 'PlatEMO-master\PlatEMO\Algorithms\Multi-objective optimization'.
