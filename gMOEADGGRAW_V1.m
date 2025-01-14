@@ -109,11 +109,9 @@ classdef gMOEADGGRAW_V1 < ALGORITHM
                 % Update weights (for AdaW)
                 if ~mod(ceil(Problem.FE/Problem.N),ceil(0.05*ceil(Problem.maxFE/Problem.N))) && Problem.FE <= Problem.maxFE*0.9
                     if length(Archive) > 1
-                        [Population,W_dir,B] = WeightUpdate(Population,W,1./W./sum(1./W,2),type,h,Archive,z,zmax,Tr,Problem);
-                        W = 1./W_dir./sum(1./W_dir,2);
+                        [Population,W,h,B] = WeightUpdate(Population,W,1./W./sum(1./W,2),type,h,Archive,z,zmax,Tr,Problem);
                         Bm = B(:, 1:Tm);
                         % Br = B(:, 1:Tr);
-                        h = (prod(W,2).^(-1/Problem.M));
                         % plot3(W_dir(:,1),W_dir(:,2),W_dir(:,3),'*'), view(135,30), grid on
                     end
                 end
@@ -129,7 +127,7 @@ function objs_n = normalize_2(objs, lb, ub)
 end
 
 
-function [Population,W_dir,B] = WeightUpdate(Population,W,W_dir,type,h,Archive,zmin,zmax,T,Problem)
+function [Population,W,h,B] = WeightUpdate(Population,W,W_dir,type,h,Archive,zmin,zmax,T,Problem)
 % Weight Update
 % Modified by Ruihao Zheng
 
@@ -165,6 +163,7 @@ function [Population,W_dir,B] = WeightUpdate(Population,W,W_dir,type,h,Archive,z
     % Obtain their corresponding weights.
     if ~isempty(Archive_und)
         W1_dir = (Archiveundobjs-zmin) ./ sum(Archiveundobjs-zmin,2);
+        W1_dir(W1_dir==0) = 1e-6;  % avoid nan in W1
         W1 = 1./W1_dir./sum(W1_dir,2);
         h1 = (prod(W1,2).^(-1/Problem.M));
         for i = 1 : size(W1_dir,1)
