@@ -93,7 +93,8 @@ classdef gMOEADGGRAW_V1 < ALGORITHM
                 for i = 1 : Problem.N
                     closest = find(I_subp==i & select_counter<Tr);  % a solution is selected at most Tr times.
                     if isempty(closest)
-                        index_Pt(i) = i;  % Pt should not be shuffled since we assume the i-th solution of Pt corresponds to the original solution of i-th subproblem.
+                        % index_Pt(i) = i;  % Pt should not be shuffled since we assume the i-th solution of Pt corresponds to the original solution of i-th subproblem.
+                        [~,index_Pt(i)] = min(g(:,i));  % improve the convergence by this greedy method; it is helpful to find the boundary of the concave PF when p=1
                         continue
                     end
                     [~, Ri] = min(g(closest, i));
