@@ -5,18 +5,19 @@ classdef gMOEADGGRAW_V1 < ALGORITHM
 % p --- 1 --- The parameter p of GNS
 % Tm --- 0.1 --- The mating neighborhood size
 % Tr --- 0.001 --- The replacement neighborhood size
-% rho_cone --- 0.11 --- 
+% alpha --- 0.1 --- 
 % 
 %   Ref: "What Weights Work for You? Adapting Weights for Any Pareto Front
 %   Shape in Decomposition-Based Evolutionary Multiobjective Optimisation"
 %   (AdaW) and "Knee Point Based Evolutionary Multi-Objective Optimization
 %   for Mission Planning Problems" (cone dominance)
+% 
 %   Author: Ruihao Zheng
 
     methods
         function main(Algorithm,Problem)
             %% Parameter setting
-            [delta, p, Tm, Tr, rho_cone] = Algorithm.ParameterSet(1, 1, 0.1, 0.001, 0.11);
+            [delta, p, Tm, Tr, alpha] = Algorithm.ParameterSet(1, 1, 0.1, 0.001, 0.1);
 
             %% initialization
             % Generate the weight vectors
@@ -105,7 +106,7 @@ classdef gMOEADGGRAW_V1 < ALGORITHM
 
                 % Maintenance operation in the archive set (for AdaW)
                 Archive = [Archive,Offspring];
-                Archive = ArchiveUpdate(Archive,2*Problem.N,z,zmax,rho_cone);
+                Archive = ArchiveUpdate(Archive,2*Problem.N,z,zmax,alpha);
 
                 % Update weights (for AdaW)
                 if ~mod(ceil(Problem.FE/Problem.N),ceil(0.05*ceil(Problem.maxFE/Problem.N))) && Problem.FE <= Problem.maxFE*0.9
@@ -243,7 +244,7 @@ function [Population,W,h,B] = WeightUpdate(Population,W,W_dir,type,h,Archive,zmi
 end
 
 
-function Archive = ArchiveUpdate(Archive,N,zmin,zmax,rho_cone)
+function Archive = ArchiveUpdate(Archive,N,zmin,zmax,alpha)
 % Archive Update
 % Modified by Ruihao Zheng
 
@@ -257,7 +258,7 @@ function Archive = ArchiveUpdate(Archive,N,zmin,zmax,rho_cone)
 %--------------------------------------------------------------------------
 
     arcobjs = (Archive.objs - zmin) ./ (zmax - zmin);  % normalization
-    index = NDSort(arcobjs + rho_cone*sum(arcobjs,2), 1) == 1;
+    index = NDSort((1-alpha)*arcobjs + (alpha/length(zmin))*sum(arcobjs,2), 1) == 1;
     Archive = Archive(index);
     arcobjs = arcobjs(index,:);
     PCObj = arcobjs;
