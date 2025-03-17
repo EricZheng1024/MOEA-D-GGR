@@ -166,7 +166,7 @@ function [Population,W,h,B] = WeightUpdate(Population,W,W_dir,type,h,Archive,zmi
     if ~isempty(Archive_und)
         W1_dir = (Archiveundobjs-zmin) ./ sum(Archiveundobjs-zmin,2);
         W1_dir(W1_dir==0) = 1e-6;  % avoid nan in W1
-        W1 = 1./W1_dir./sum(W1_dir,2);
+        W1 = 1./W1_dir./sum(1./W1_dir,2);
         h1 = (prod(W1,2).^(-1/Problem.M));
         for i = 1 : size(W1_dir,1)
             W_all = [W_dir;W1_dir(i,:)];
