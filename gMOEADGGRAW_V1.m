@@ -81,16 +81,16 @@ classdef gMOEADGGRAW_V1 < ALGORITHM
                 
                 % Replacement
                 Pt = [Population Offspring];
-                objs = normalize_2(Pt.objs, z, zmax);  % normalization
+                objs_n = normalize_2(Pt.objs, z, zmax);  % normalization
                 % Calculate the subproblem function values  O(N^2)
-                g = zeros(size(objs,1), Problem.N);
+                g = zeros(size(objs_n,1), Problem.N);
                 for i = 1 : Problem.N
-                    g(:, i) = calSubpFitness(type, objs, z, W(i, :)) * h(i);
+                    g(:, i) = calSubpFitness(type, objs_n, zeros(1,Problem.M), W(i, :)) * h(i);
                 end
                 % Find the most suitable solution for each subproblem
                 [~, I_subp] = min(g, [], 2);
                 index_Pt = zeros(Problem.N, 1);
-                select_counter = zeros(size(objs,1),1);
+                select_counter = zeros(size(objs_n,1),1);
                 for i = 1 : Problem.N
                     closest = find(I_subp==i & select_counter<Tr);  % a solution is selected at most Tr times.
                     if isempty(closest)
